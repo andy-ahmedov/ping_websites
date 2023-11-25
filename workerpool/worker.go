@@ -24,7 +24,8 @@ func New(workerCount int, timeout time.Duration, result chan Result) *Pool {
 	return &Pool{
 		worker:      newWorker(timeout),
 		results:     result,
-		wg:          new(sync.WaitGroup),
+		cntJob:      new(sync.WaitGroup),
+		cntResult:   new(sync.WaitGroup),
 		workerCount: workerCount,
 		jobs:        make(chan Job),
 		stopped:     false,
@@ -55,8 +56,9 @@ func RunWorker(worker *Pool) { // ПЕРВЫЙ
 func (worker *Pool) GetWorker(ID int) { // ВТОРОЙ
 	for job := range worker.jobs {
 		time.Sleep(time.Second)
+		worker.cntResult.Add(1)
 		worker.results <- worker.worker.process(job)
-		worker.wg.Done()
+		worker.cntJob.Done()
 	}
 	log.Printf("worker ID %d finished", ID)
 }
@@ -65,11 +67,10 @@ func (worker *Pool) PushURL(urls []string) { // ТРЕТИЙ
 	for {
 		for _, url := range urls {
 			if worker.stopped {
-				close(worker.jobs)
 				return
 			}
-			worker.wg.Add(1)
 			worker.jobs <- Job{URL: url}
+			worker.cntJob.Add(1)
 		}
 		time.Sleep(INTERVAL)
 		fmt.Println("---------------")
@@ -77,9 +78,8 @@ func (worker *Pool) PushURL(urls []string) { // ТРЕТИЙ
 }
 
 func (worker *Pool) GetResult() { // ЧЕТВЕРТЫЙ
-	go func() {
-		for result := range worker.results {
-			fmt.Println(result.Info())
-		}
-	}()
+	for result := range worker.results {
+		fmt.Println(result.Info())
+		worker.cntResult.Done()
+	}
 }

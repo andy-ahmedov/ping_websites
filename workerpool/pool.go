@@ -18,12 +18,14 @@ type Result struct {
 }
 
 type Pool struct {
+	cntResult   *sync.WaitGroup
+	stoppedInt  int32
 	stopped     bool
 	workerCount int
 	worker      *worker
 	jobs        chan Job
 	results     chan Result
-	wg          *sync.WaitGroup
+	cntJob      *sync.WaitGroup
 }
 
 func (r Result) Info() string {
@@ -35,10 +37,10 @@ func (r Result) Info() string {
 
 func (p *Pool) Stop() {
 	p.stopped = true
-
 	fmt.Printf("\nGRACEFUL SHUTDOWN:\n")
+	p.cntJob.Wait()
+	p.cntResult.Wait()
 
 	close(p.jobs)
-
-	p.wg.Wait()
+	close(p.results)
 }
