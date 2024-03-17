@@ -29,7 +29,6 @@ $ git clone https://github.com/andy-ahmedov/crud_service
 # Run program
 $ go run main.go
 ```
-
 ## 🔨 STACK ##
   <a href="https://go.dev/" target="_blank"> <img src="https://github.com/andy-ahmedov/andy-ahmedov/blob/main/files/Go-Logo_Yellow.png?raw=true" alt="golang" align="left" height='50px'/> </a>
   <a href="https://www.gnu.org/software/bash/" target="_blank"> <img src="https://raw.githubusercontent.com/andy-ahmedov/README_icons/5a0bd0723991e5d95e0eb90ce4e544345b69e05b/language_and_tools/square/bash/bash.svg" alt="bash" align="left" height='50px'/> </a>
